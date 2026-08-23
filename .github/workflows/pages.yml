@@ -1,0 +1,48 @@
+name: Deploy portfolio to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct exact portfolio
+        shell: bash
+        run: |
+          mkdir -p site
+          cat .portfolio_chunks/*.b64 > /tmp/portfolio.html.xz.b64
+          base64 -d /tmp/portfolio.html.xz.b64 > /tmp/portfolio.html.xz
+          xz -dc /tmp/portfolio.html.xz > site/index.html
+          echo "9e6df0d1cccfa38bd91d2d81746f07470ff90200f0b2e70e4995d688580a9f1b  site/index.html" | sha256sum -c -
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
