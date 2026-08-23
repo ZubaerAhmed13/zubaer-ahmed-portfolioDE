@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -36,6 +36,21 @@ jobs:
           base64 -d .portfolio_patch/portfolio_v2_to_v3.zst.b64 > /tmp/portfolio.patch.zst
           zstd -d --patch-from=/tmp/portfolio-v2.html /tmp/portfolio.patch.zst -q -o site/index.html
           echo "9e6df0d1cccfa38bd91d2d81746f07470ff90200f0b2e70e4995d688580a9f1b  site/index.html" | sha256sum -c -
+
+      - name: Materialize verified index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f index.html ] && cmp -s site/index.html index.html; then
+            echo "index.html already matches the verified portfolio"
+          else
+            cp site/index.html index.html
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Materialize exact portfolio [skip ci]"
+            git push
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
