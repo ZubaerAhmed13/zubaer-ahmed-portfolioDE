@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -27,12 +27,13 @@ jobs:
       - name: Build business-value portfolio
         run: python3 portfolio-build/build_portfolio.py index.html
 
-      - name: Verify upgraded portfolio
+      - name: Verify upgraded portfolio before deployment
         run: |
           grep -q "VideoFlow Professional" index.html
           grep -q "VideoFlow Android" index.html
           grep -q "AI as execution leverage" index.html
           grep -q "Samsung Innovation Analysis" index.html
+          test "$(grep -o 'id=\"projects\"' index.html | wc -l)" -eq 1
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -45,3 +46,40 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify live Pages content
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${PAGE_URL%/}/"
+          ok=0
+          for i in $(seq 1 18); do
+            url="${base}?deployment=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
+            if curl -fsSL --retry 2 --retry-delay 2 "$url" -o /tmp/live.html \
+              && grep -q "VideoFlow Professional" /tmp/live.html \
+              && grep -q "VideoFlow Android" /tmp/live.html \
+              && grep -q "Samsung Innovation Analysis" /tmp/live.html \
+              && grep -q "AI as execution leverage" /tmp/live.html; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "Live Pages validation failed: the public URL did not expose the upgraded portfolio."
+            exit 1
+          fi
+
+      - name: Persist generated index.html to main
+        if: success()
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "index.html is already the generated portfolio."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Persist upgraded portfolio index"
+          git push origin HEAD:main
