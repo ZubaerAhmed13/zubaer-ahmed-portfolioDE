@@ -24,6 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build business-value portfolio
+        run: python3 portfolio-build/build_portfolio.py index.html
+
+      - name: Verify upgraded portfolio
+        run: |
+          grep -q "VideoFlow Professional" index.html
+          grep -q "VideoFlow Android" index.html
+          grep -q "AI as execution leverage" index.html
+          grep -q "Samsung Innovation Analysis" index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
