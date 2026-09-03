@@ -1,4 +1,4 @@
-name: Deploy portfolio to GitHub Pages
+name: Deploy exact portfolio to GitHub Pages
 
 on:
   push:
@@ -24,62 +24,109 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build business-value portfolio
-        run: python3 portfolio-build/build_portfolio.py index.html
-
-      - name: Verify upgraded portfolio before deployment
+      - name: Materialize exact approved portfolio
+        shell: bash
         run: |
+          set -euo pipefail
+          EXPECTED_SOURCE="fd74f67beb21af05e0c1c601234f91c062805edf4bbaf50170bfbf916ee4c6b4"
+          EXPECTED_TARGET="be682fec1ce14ce38253d999504d889a54d4e4cde8e7126c1d3f8f813c5491fa"
+          CURRENT="$(sha256sum index.html | awk '{print $1}')"
+
+          if [ "$CURRENT" = "$EXPECTED_TARGET" ]; then
+            echo "index.html is already the exact approved portfolio."
+          else
+            if [ "$CURRENT" != "$EXPECTED_SOURCE" ]; then
+              echo "Refusing to patch an unexpected index.html base."
+              echo "Expected source: $EXPECTED_SOURCE"
+              echo "Actual source:   $CURRENT"
+              exit 1
+            fi
+
+            base64 --decode .portfolio_patch/current_to_exact.zst.b64 > /tmp/current_to_exact.zst
+            zstd -q -d --patch-from=index.html /tmp/current_to_exact.zst -o /tmp/exact-index.html
+            PATCHED="$(sha256sum /tmp/exact-index.html | awk '{print $1}')"
+            if [ "$PATCHED" != "$EXPECTED_TARGET" ]; then
+              echo "Lossless reconstruction hash mismatch."
+              echo "Expected target: $EXPECTED_TARGET"
+              echo "Actual target:   $PATCHED"
+              exit 1
+            fi
+            mv /tmp/exact-index.html index.html
+          fi
+
+      - name: Verify exact approved file before deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="be682fec1ce14ce38253d999504d889a54d4e4cde8e7126c1d3f8f813c5491fa"
+          ACTUAL="$(sha256sum index.html | awk '{print $1}')"
+          test "$ACTUAL" = "$EXPECTED"
+          test "$(wc -c < index.html)" -eq 1662673
+          grep -q "Zubaer Ahmed | Finance · Business Analysis · PMO · Operations" index.html
           grep -q "VideoFlow Professional" index.html
           grep -q "VideoFlow Android" index.html
           grep -q "AI as execution leverage" index.html
-          grep -q "Samsung Innovation Analysis" index.html
-          test "$(grep -o 'id=\"projects\"' index.html | wc -l)" -eq 1
+          ! grep -q "Zubaer Ahmed | Business × Finance × AI" index.html
+
+      - name: Prepare Pages site
+        run: |
+          rm -rf _site
+          mkdir _site
+          cp index.html _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Pages artifact
+      - name: Upload exact Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Verify live Pages content
+      - name: Verify public site is byte-identical
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
         run: |
           set -euo pipefail
-          base="${PAGE_URL%/}/"
-          ok=0
-          for i in $(seq 1 18); do
-            url="${base}?deployment=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
-            if curl -fsSL --retry 2 --retry-delay 2 "$url" -o /tmp/live.html \
-              && grep -q "VideoFlow Professional" /tmp/live.html \
-              && grep -q "VideoFlow Android" /tmp/live.html \
-              && grep -q "Samsung Innovation Analysis" /tmp/live.html \
-              && grep -q "AI as execution leverage" /tmp/live.html; then
-              ok=1
-              break
+          EXPECTED="be682fec1ce14ce38253d999504d889a54d4e4cde8e7126c1d3f8f813c5491fa"
+          BASE="${PAGE_URL%/}/"
+          OK=0
+          for i in $(seq 1 24); do
+            URL="${BASE}?exact=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
+            if curl -fsSL --retry 2 --retry-delay 1 \
+                 -H 'Cache-Control: no-cache, no-store, max-age=0' \
+                 -H 'Pragma: no-cache' \
+                 "$URL" -o /tmp/live.html; then
+              LIVE="$(sha256sum /tmp/live.html | awk '{print $1}')"
+              if [ "$LIVE" = "$EXPECTED" ]; then
+                echo "Public GitHub Pages file is byte-identical to the approved portfolio."
+                OK=1
+                break
+              fi
+              echo "Attempt $i served hash $LIVE; waiting for Pages propagation."
             fi
             sleep 5
           done
-          if [ "$ok" -ne 1 ]; then
-            echo "Live Pages validation failed: the public URL did not expose the upgraded portfolio."
+          if [ "$OK" -ne 1 ]; then
+            echo "Public site did not become byte-identical to the approved portfolio."
             exit 1
           fi
 
-      - name: Persist generated index.html to main
+      - name: Persist exact index.html to main
         if: success()
+        shell: bash
         run: |
+          set -euo pipefail
           if git diff --quiet -- index.html; then
-            echo "index.html is already the generated portfolio."
+            echo "main/index.html is already exact."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Persist upgraded portfolio index"
+          git commit -m "Persist exact approved portfolio [skip ci]"
           git push origin HEAD:main
