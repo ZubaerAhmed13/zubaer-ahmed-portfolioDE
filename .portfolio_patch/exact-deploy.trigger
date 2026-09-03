@@ -1,0 +1,2 @@
+Exact approved portfolio deployment trigger.
+Target SHA-256: be682fec1ce14ce38253d999504d889a54d4e4cde8e7126c1d3f8f813c5491fa
