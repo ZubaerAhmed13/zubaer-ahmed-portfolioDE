@@ -1,0 +1,62 @@
+[
+  {
+    "company": "Picnic",
+    "location": "Viernheim FC7, Germany",
+    "dates": "Apr 2025 - Present",
+    "title": "Working Student - Operations Support",
+    "tools": ["WMS", "Barcode scanners", "Slack", "Workday (employee use)", "Teamwork"],
+    "duties": [
+      ["Inventory verification", "Conduct cycle counts and compare physical stock with WMS records to identify and report discrepancies."],
+      ["Replenishment", "Restock assigned shelf locations through WMS-guided workflows and respond to product-availability needs."],
+      ["Picking and fulfilment", "Use barcode scanners and WMS instructions to support accurate picking and daily operational targets."],
+      ["Quality checks", "Inspect products for damage, packaging condition, expiry dates and quality standards."],
+      ["Product classification", "Separate below-standard products and record quantities classified for disposal or Too Good To Go resale."],
+      ["Shift reporting", "Report quality findings, product quantities, classifications and operational issues to team leads through Slack during assigned quality shifts."],
+      ["Exception handling", "Investigate stock and replenishment discrepancies, communicate findings and escalate issues through established workflows."],
+      ["Workflow observations", "Identified recurring barcode-scanning delays, plastic-packaging damage and tote-position linking problems, and raised practical improvement suggestions."],
+      ["Layout improvement", "Identified lane congestion linked to product placement and proposed a revised layout that was subsequently adopted for a workflow involving approximately 15-20 people."],
+      ["Team coordination", "Coordinate with colleagues and shift leadership in an international fulfilment team, following operating standards and time-sensitive priorities."]
+    ]
+  },
+  {
+    "company": "Rafin Fashion House",
+    "location": "Narayanganj, Bangladesh",
+    "dates": "Jul 2023 - Nov 2024",
+    "title": "Operations Team Lead",
+    "tools": ["Microsoft Excel", "Microsoft Teams", "Microsoft PowerPoint", "CCTV/security coordination"],
+    "duties": [
+      ["Team leadership", "Coordinated daily activities for 6-8 employees and communicated operational priorities through Microsoft Teams."],
+      ["Sales and KPI tracking", "Monitored sales figures and team KPIs in Excel using sorting and lookup functions."],
+      ["Demand monitoring", "Reviewed changes in sales and demand timing to inform stock and operational priorities."],
+      ["Stock replenishment", "Monitored stock needs for new designs and coordinated replenishment requests through Microsoft Teams."],
+      ["Customer service and returns", "Reviewed return reasons, investigated recurring customer issues and coordinated resolutions."],
+      ["Daily reporting", "Reported sales and operational progress to the supervisor, including customer and stock-related issues."],
+      ["Promotional materials", "Created promotional banners using Microsoft PowerPoint to support product communication."],
+      ["Security coordination", "Supported CCTV monitoring and security coordination as part of daily shop operations."]
+    ]
+  },
+  {
+    "company": "Mutual Trust Bank PLC",
+    "location": "Sonargaon Branch, Bangladesh",
+    "dates": "Jan 2023 - Apr 2023",
+    "title": "General Banking Intern",
+    "tools": ["Core Banking System", "TCS", "Microsoft Excel", "Word", "PowerPoint", "SharePoint", "Docs Dex"],
+    "duties": [
+      ["Account applications", "Processed up to 15 new-account applications in one day and prepared documentation for final review."],
+      ["Account and product support", "Supported savings, current, term-deposit/FDR and DPS account-related processes and explained product requirements to customers."],
+      ["KYC documentation", "Checked customer photographs, birth certificates or national identity documents, addresses, income-source information and supporting paperwork."],
+      ["AML procedures", "Completed required AML screening steps for new customers according to branch procedures."],
+      ["Customer records", "Updated customer and account information in the Core Banking System and maintained supporting records."],
+      ["Document processing", "Organised and scanned completed application files and sent them to LOD for central processing and final checks using Docs Dex; used SharePoint for file storage and sharing."],
+      ["Cheque and card tracking", "Maintained cheque-book and debit/credit-card distribution trackers in Excel using sorting and lookup functions."],
+      ["Funds clearance", "Checked funds-clearance status through TCS as part of routine branch processing."],
+      ["Account services", "Supported dormant-account activation and customer-requested account closures."],
+      ["Customer communication", "Answered product and account inquiries, explained required documents and followed up on missing information."],
+      ["Cash-transaction support", "Assisted routine cash-transaction processes under staff supervision."],
+      ["Credit-department support", "Assisted information requests from the credit department and participated in mortgage-asset site visits."],
+      ["Reports and meetings", "Prepared Word and Excel reports and shared progress in morning and end-of-day meetings with the manager."],
+      ["Student-account campaign", "Supported a college student-account campaign through customer communication and product information."],
+      ["Branch notices", "Prepared PowerPoint notices for branch information boards."]
+    ]
+  }
+]
