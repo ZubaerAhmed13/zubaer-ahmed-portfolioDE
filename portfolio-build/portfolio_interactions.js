@@ -24,9 +24,13 @@
   const recruiter = document.getElementById('recruiterModal');
   const lightbox = document.getElementById('lightbox');
   const dialogs = [...document.querySelectorAll('.portfolioDialog')];
+  const dialogTriggers = new WeakMap();
   function openDialog(dialog) {
     if (dialog.open) return;
+    const trigger = navigation.contains(document.activeElement) && dialog !== navigation ? menuButton : document.activeElement;
+    dialogTriggers.set(dialog, trigger);
     dialogs.forEach(other => { if (other.open) other.close(); });
+    dialog.returnValue = '';
     dialog.showModal();
     document.body.classList.add('scrollLocked');
     menuButton.setAttribute('aria-expanded', String(navigation.open));
@@ -41,6 +45,7 @@
     dialog.addEventListener('close', () => {
       document.body.classList.toggle('scrollLocked', dialogs.some(item => item.open));
       menuButton.setAttribute('aria-expanded', String(navigation.open));
+      if (!dialogs.some(item => item.open) && dialog.returnValue !== 'navigate') dialogTriggers.get(dialog)?.focus({ preventScroll: true });
     });
     // A click outside the actual dialog closes its native backdrop.
     dialog.addEventListener('click', event => {
@@ -52,7 +57,7 @@
   menuButton.addEventListener('click', () => openDialog(navigation));
   document.querySelectorAll('[data-recruiter]').forEach(button => button.addEventListener('click', () => openDialog(recruiter)));
   navigation.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => {
-    navigation.close();
+    navigation.close('navigate');
     const target = document.querySelector(link.getAttribute('href'));
     if (target) requestAnimationFrame(() => {
       const heading = target.querySelector('h1,h2') || target;
