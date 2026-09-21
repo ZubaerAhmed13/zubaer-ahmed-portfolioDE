@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           EXPECTED_SOURCE="fd74f67beb21af05e0c1c601234f91c062805edf4bbaf50170bfbf916ee4c6b4"
-          EXPECTED_TARGET="2f6b4bd895058d95da203f542ea8085f61b2e07974168d23c7f05c655ac0e1d2"
+          EXPECTED_TARGET="1e8761fb2e83ab1b5901331dc31dd434f856b3e739aa2758fce6a7af28392d41"
           CURRENT="$(sha256sum index.html | awk '{print $1}')"
 
           if [ "$CURRENT" = "$EXPECTED_TARGET" ]; then
@@ -58,10 +58,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED="2f6b4bd895058d95da203f542ea8085f61b2e07974168d23c7f05c655ac0e1d2"
+          EXPECTED="1e8761fb2e83ab1b5901331dc31dd434f856b3e739aa2758fce6a7af28392d41"
           ACTUAL="$(sha256sum index.html | awk '{print $1}')"
           test "$ACTUAL" = "$EXPECTED"
-          test "$(wc -c < index.html)" -eq 1321643
+          test "$(wc -c < index.html)" -eq 1282906
           grep -q "Zubaer Ahmed | Finance · Business Analysis · PMO · Operations" index.html
           grep -q "VideoFlow Professional" index.html
           grep -q "VideoFlow Android" index.html
@@ -92,7 +92,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED="2f6b4bd895058d95da203f542ea8085f61b2e07974168d23c7f05c655ac0e1d2"
+          EXPECTED="1e8761fb2e83ab1b5901331dc31dd434f856b3e739aa2758fce6a7af28392d41"
           BASE="${PAGE_URL%/}/"
           OK=0
           for i in $(seq 1 24); do
