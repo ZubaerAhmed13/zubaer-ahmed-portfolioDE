@@ -49,7 +49,7 @@ preview_js = r'''<script id="business-value-project-preview">
   load.addEventListener('click',()=>{if(!url)return;frame.title='Live project preview — '+name;frame.src=url;frame.hidden=false;placeholder.hidden=true;});
 })();
 </script>'''
-if 'id="business-value-project-preview"' not in html:
+if 'id="business-value-project-preview"' not in html and 'id="portfolio-interactions"' not in html:
     pos = html.lower().rfind("</body>")
     if pos < 0:
         raise SystemExit("Build stopped: no </body> anchor found for preview behaviour.")
@@ -69,4 +69,8 @@ if html.count('id="projects"') != 1:
     raise SystemExit("Build stopped: #projects must exist exactly once.")
 
 TARGET.write_text(html, encoding="utf-8")
+# Keep the shared interaction and responsive sources authoritative on rebuild.
+if 'id="responsive-design"' in html:
+    from apply_responsive_design import apply_design
+    apply_design(TARGET)
 print(f"Portfolio upgraded successfully: {TARGET} ({len(html):,} characters)")
